@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Threat Detection</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+
+        header {
+            background: #020617;
+            padding: 15px;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        select, button {
+            padding: 8px 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: none;
+            margin: 5px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .video-box {
+            margin-top: 20px;
+            display: inline-block;
+            border: 3px solid #334155;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        img {
+            width: 640px;
+        }
+
+        .status-box {
+            margin-top: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .normal {
+            background: #022c22;
+            color: #22c55e;
+        }
+
+        .suspicious {
+            background: #3f2a00;
+            color: #facc15;
+        }
+
+        .dangerous {
+            background: #3f0000;
+            color: #ef4444;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.5; }
+        }
+
+        .alert {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #ef4444;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>🚨 AI-based Real-Time Threat and Danger Recognition System</header>
+
+<div class="container">
+
+    <form method="POST">
+        <label>Select Video:</label>
+        <select name="video">
+            {% for v in videos %}
+            <option value="{{v}}" {% if v==selected %}selected{% endif %}>{{v}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">▶ Play</button>
+    </form>
+
+    <div class="video-box">
+        <img src="{{ url_for('video') }}">
+    </div>
+
+    <div id="status" class="status-box">Loading...</div>
+
+    <div id="alertBox" class="alert">🚨 ALERT! Dangerous Activity Detected!</div>
+
+</div>
+
+<script>
+function updateStatus() {
+    fetch('/get_label')
+    .then(res => res.json())
+    .then(data => {
+        let label = data.label;
+        let statusDiv = document.getElementById("status");
+        let alertBox = document.getElementById("alertBox");
+
+        statusDiv.innerText = label;
+        statusDiv.className = "status-box";
+
+        alertBox.style.display = "none";
+
+        if(label === "Normal") {
+            statusDiv.classList.add("normal");
+        }
+        else if(label === "Suspicious") {
+            statusDiv.classList.add("suspicious");
+        }
+        else if(label === "Dangerous") {
+            statusDiv.classList.add("dangerous");
+            alertBox.style.display = "block";
+        }
+    });
+}
+
+setInterval(updateStatus, 800);
+</script>
+
+</body>
+</html>
